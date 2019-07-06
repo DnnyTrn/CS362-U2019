@@ -768,7 +768,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
       return -1;
 			
     case mine:
-      	playMine(state, currentPlayer, choice1, choice2, handPos);
+      	return playMine(state, currentPlayer, choice1, choice2, handPos);
     case remodel:
       j = state->hand[currentPlayer][choice1];  //store card we will trash
 
@@ -818,7 +818,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
       return 0;
 		
     case baron:
-        playBaron(state, choice1, currentPlayer);
+        return playBaron(state, choice1, currentPlayer);
 		
     case great_hall:
       //+1 Card
@@ -906,11 +906,11 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
       return 0;
 		
     case tribute:
-        playTribute(state, nextPlayer, tributeRevealedCards, currentPlayer);
+        return playTribute(state, nextPlayer, tributeRevealedCards, currentPlayer);
 
 		
     case ambassador:
-        playAmbassador(state, choice1, currentPlayer, choice2, handPos);	
+       return playAmbassador(state, choice1, currentPlayer, choice2, handPos);	
     
     case cutpurse:
 
@@ -1168,7 +1168,7 @@ int playBaron(struct gameState *state, int choice1, int currentPlayer){
                 if (supplyCount(estate, state) > 0)
                 {
                     gainCard(estate, state, 0, currentPlayer);
-                    state->supplyCount[estate]--; //Decrement estates
+                    state->supplyCount[estate]++; //Decrement estates bug 2
                     if (supplyCount(estate, state) == 0)
                     {
                         isGameOver(state);
@@ -1186,15 +1186,17 @@ int playBaron(struct gameState *state, int choice1, int currentPlayer){
 
     else
     {
-        if (supplyCount(estate, state) > 0)
-        {
-            gainCard(estate, state, 0, currentPlayer); //Gain an estate
-            state->supplyCount[estate]--;              //Decrement Estates
-            if (supplyCount(estate, state) == 0)
-            {
-                isGameOver(state);
-            }
-        }
+        gainCard(estate, state, 0, currentPlayer); //Gain an estate  - bug 1
+
+        // if (supplyCount(estate, state) > 0)
+        // {
+        //     gainCard(estate, state, 0, currentPlayer); //Gain an estate
+        //     state->supplyCount[estate]--;              //Decrement Estates
+        //     if (supplyCount(estate, state) == 0)
+        //     {
+        //         isGameOver(state);
+        //     }
+        // }
     }
 
     return 0;
@@ -1207,12 +1209,12 @@ int playMinion(struct gameState *state, int choice1, int currentPlayer, int choi
     //discard card from hand
     discardCard(handPos, currentPlayer, state, 0);
 
-    if (choice1) //+2 coins
+    if (choice2) //+2 coins //bug 1
     {
         state->coins = state->coins + 2;
     }
 
-    else if (choice2) //discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
+    else if (choice1) //discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
     {
         //discard hand
         while (numHandCards(state) > 0)
@@ -1220,8 +1222,8 @@ int playMinion(struct gameState *state, int choice1, int currentPlayer, int choi
             discardCard(handPos, currentPlayer, state, 0);
         }
 
-        //draw 4
-        for (int i = 0; i < 4; i++)
+        //draw 4 bug 2T
+        for (int i = 0; i < 5; i++)
         {
             drawCard(currentPlayer, state);
         }
@@ -1287,7 +1289,7 @@ int playAmbassador(struct gameState *state, int choice1, int currentPlayer, int 
     {
         if (i != currentPlayer)
         {
-            gainCard(state->hand[currentPlayer][choice1], state, 0, i);
+            // gainCard(state->hand[currentPlayer][choice1], state, 0, i); bug 1
         }
     }
 
@@ -1302,7 +1304,7 @@ int playAmbassador(struct gameState *state, int choice1, int currentPlayer, int 
             if (state->hand[currentPlayer][i] == state->hand[currentPlayer][choice1])
             {
                 discardCard(i, currentPlayer, state, 1);
-                break;
+                // break;    bug 2
             }
         }
     }
@@ -1366,7 +1368,8 @@ int playTribute(struct gameState *state, int nextPlayer, int *tributeRevealedCar
     {
         if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold)
         { //Treasure cards
-            state->coins += 2;
+            state->coins += 0; //bug 1 player doesn't get their coins 
+            // state->coins += 2;
         }
 
         else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == gardens || tributeRevealedCards[i] == great_hall)
@@ -1376,7 +1379,8 @@ int playTribute(struct gameState *state, int nextPlayer, int *tributeRevealedCar
         }
         else
         { //Action Card
-            state->numActions = state->numActions + 2;
+            state->numActions = state->numActions + 0;  //bug 2 
+            // state->numActions = state->numActions + 2;
         }
     }
 
@@ -1384,7 +1388,8 @@ int playTribute(struct gameState *state, int nextPlayer, int *tributeRevealedCar
 }
 
 int playMine(struct gameState *state, int currentPlayer, int choice1, int choice2, int handPos) {
-    int j = state->hand[currentPlayer][choice1]; //store card we will trash
+    int j = state->hand[currentPlayer][choice2]; //store card we will trash bug 1
+    // int j = state->hand[currentPlayer][choice1]; //store card we will trash
 
     if (state->hand[currentPlayer][choice1] < copper || state->hand[currentPlayer][choice1] > gold)
     {
@@ -1404,7 +1409,7 @@ int playMine(struct gameState *state, int currentPlayer, int choice1, int choice
     gainCard(choice2, state, 2, currentPlayer);
 
     //discard card from hand
-    discardCard(handPos, currentPlayer, state, 0);
+    // discardCard(handPos, currentPlayer, state, 0); bug 2
 
     //discard trashed card
     for (int i = 0; i < state->handCount[currentPlayer]; i++)
