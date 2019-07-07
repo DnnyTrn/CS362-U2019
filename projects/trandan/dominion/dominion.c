@@ -1406,10 +1406,10 @@ int playMine(struct gameState *state, int currentPlayer, int choice1, int choice
         return -1;
     }
 
-    gainCard(choice2, state, 2, currentPlayer);
+    // gainCard(choice2, state, 2, currentPlayer); bug 2
 
     //discard card from hand
-    // discardCard(handPos, currentPlayer, state, 0); bug 2
+    discardCard(handPos, currentPlayer, state, 0); 
 
     //discard trashed card
     for (int i = 0; i < state->handCount[currentPlayer]; i++)
