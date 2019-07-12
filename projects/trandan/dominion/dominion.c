@@ -1137,8 +1137,12 @@ int updateCoins(int player, struct gameState *state, int bonus)
   return 0;
 }
 
+// Baron is an action card that allows the player to discard an Estate card
+// in exchange for 4 coins, otherwise the player may gain an Estate card.
+// +1 Buy, -1 estate for +4 coins OR +1 estate
 int playBaron(struct gameState *state, int choice1, int currentPlayer){
     state->numBuys++; //Increase buys by 1!
+    // -1 Estate and +4 Coins
     if (choice1 > 0)
     {                               //Boolean true or going to discard an estate
         int p = 0;                  //Iterator for hand!
