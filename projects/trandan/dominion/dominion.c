@@ -1161,6 +1161,7 @@ int playBaron(struct gameState *state, int choice1, int currentPlayer){
                 state->hand[currentPlayer][state->handCount[currentPlayer]] = -1;
                 state->handCount[currentPlayer]--;
                 card_not_discarded = 0; //Exit the loop
+                // code to increment game state estate count is missing 
             }
             else if (p > state->handCount[currentPlayer])
             {
