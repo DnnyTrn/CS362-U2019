@@ -551,7 +551,7 @@ int drawCard(int player, struct gameState *state)
     count = state->handCount[player];//Get current player's hand count
     
     if (DEBUG){//Debug statements
-      printf("Current hand count: %d\n", count);
+    //   printf("Current hand count: %d\n", count);
     }
     
     deckCounter = state->deckCount[player];//Create a holder for the deck count
@@ -568,7 +568,7 @@ int drawCard(int player, struct gameState *state)
     int count = state->handCount[player];//Get current hand count for player
     int deckCounter;
     if (DEBUG){//Debug statements
-      printf("Current hand count: %d\n", count);
+    //   printf("Current hand count: %d\n", count);
     }
 
     deckCounter = state->deckCount[player];//Create holder for the deck count
@@ -1191,8 +1191,8 @@ int playBaron(struct gameState *state, int choice1, int currentPlayer){
 
     else
     {
-        gainCard(estate, state, 0, currentPlayer); //Gain an estate  - bug 1
-
+        int x = gainCard(estate, state, 0, currentPlayer); //Gain an estate  - bug 1
+        printf("choice2 gain a card %d\n", x);
         // if (supplyCount(estate, state) > 0)
         // {
         //     gainCard(estate, state, 0, currentPlayer); //Gain an estate
@@ -1227,7 +1227,7 @@ int playMinion(struct gameState *state, int choice1, int currentPlayer, int choi
             discardCard(handPos, currentPlayer, state, 0);
         }
 
-        //draw 4 bug 2T
+        //draw 4 bug 2
         for (int i = 0; i < 5; i++)
         {
             drawCard(currentPlayer, state);
