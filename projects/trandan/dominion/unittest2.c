@@ -18,21 +18,23 @@ int main()
     printf("\n----------------- Testing Card: %s ----------------\n", TESTCARD);
     // initialization variables
     struct gameState test_game;
-    int numPlayers = 2, seed = 1, choice1 = 1, choice2 = 0, currentPlayer = 0;
+    int numPlayers = 2, seed = 1, choice1 = 1, currentPlayer = 0;
     int minionHandPos = 0;
     int cards[10] = {ambassador, baron, embargo, village, minion, mine, cutpurse,
                      sea_hag, tribute, smithy};
     initializeGame(numPlayers, cards, seed, &test_game);
-    int handCount = test_game.handCount[currentPlayer]; 
+    int handCount = test_game.handCount[currentPlayer];
+    int preStateCoins = test_game.coins;
 
     //put minion card in player handPos 0
     test_game.hand[currentPlayer][0] = minion;
-    playMinion(&test_game, choice1, currentPlayer, choice2, minionHandPos);
+    playMinion(&test_game, choice1, currentPlayer, minionHandPos);
 
     //Test 1: Player's actions +1
 
     //Test 2: check hand for minion card, minion is discarded after play
         // printf(" card before %d %d\n ",i, hand[i] );
+    printf("Test 2: checking hand for minion card, minion should be discarded from hand\n");
     int currentCard;
     for (int i = 0; i < handCount; i++)
     {
@@ -40,7 +42,15 @@ int main()
         ASSERT(currentCard != minion, "Test 2 failed, minion card still in hand");
     }
 
-    
+    //Test 3: check if choice1 gives player +2 coins
+    int coinCount = test_game.coins;
+    int expectedCoinCount = 6;
+    printf("Test 3: COIN COUNT is %d; Expected COIN COUNT is %d \n", coinCount, expectedCoinCount);
+    ASSERT(choice1 == 1, "Test 3: choice1 variable is not 1 which designates this path");
+    ASSERT(coinCount == expectedCoinCount, "Test 3: FAILED ** COIN COUNT does not match expectedCoinCount");
+    ASSERT(preStateCoins + 2 == coinCount, "Test 3: FAILED ** preStateCoins + 2 does not match coinCount");
+
+    // Test 4:
     printf("** Unit test 2 concluded. **\n");
     return 0;
 }
