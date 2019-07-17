@@ -31,20 +31,16 @@ int main()
 
     //Test 1: Player's actions +1
 
-    //Test 2: minion is discarded after play
+    //Test 2: check hand for minion card, minion is discarded after play
         // printf(" card before %d %d\n ",i, hand[i] );
-    int hand[4];
+    int currentCard;
     for (int i = 0; i < handCount; i++)
     {
-        hand[i] = test_game.hand[currentPlayer][i];
+        currentCard = test_game.hand[currentPlayer][i];
+        ASSERT(currentCard != minion, "Test 2 failed, minion card still in hand");
     }
 
-    for (int i = 0; i < handCount; i++)
-    {
-        hand[i] = test_game.hand[currentPlayer][i];
-    }
-
-    ASSERT(hand[0] != minion, "Test 2 failed, minion card still in hand");
+    
     printf("** Unit test 2 concluded. **\n");
     return 0;
 }
