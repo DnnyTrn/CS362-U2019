@@ -71,10 +71,16 @@ int main()
     ASSERT(buyCount == preStateBuy + 1 && buyCount == expectedBuyCount, "Test 2: FAILED ** BUY COUNT is not correct value");
 
     //Test 7 check player estate count
-    // printf("%d", )
 
-    //Test 8 check game state estate count
-    //Test 9 check player coins
-    printf("** Unit test 1 concluded.\n");
+    printf(" discard count count %d\n", test_game2.discardCount[currentPlayer]);
+     for (int i = 0; i < 3; i++)
+    {
+        printf("card: %d \n", test_game2.discard[currentPlayer][i]);
+    }
+
+
+        //Test 8 check game state estate count
+        //Test 9 check player coins
+        printf("** Unit test 1 concluded.\n");
     return 0;
 }
