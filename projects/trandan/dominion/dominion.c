@@ -1214,7 +1214,7 @@ int playMinion(struct gameState *state, int choice1, int currentPlayer, int choi
     //discard card from hand
     discardCard(handPos, currentPlayer, state, 0);
 
-    if (choice2) //+2 coins //bug 1
+    if (choice2) //+2 coins //bug 1 - choice2 will always execute unless it is 0
     {
         state->coins = state->coins + 2;
     }
