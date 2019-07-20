@@ -39,7 +39,7 @@ player: player.c interface.o
 
 all: playdom player 
 
-unittestresults: unittest1.c unittest2.c cardtest2.c dominion.o
+unittestresults: unittest1.c unittest2.c cardtest1.c cardtest2.c cardtest3.c dominion.o
 	gcc -o unittest1 dominion.c rngs.c unittest1.c $(CFLAGS)
 	./unittest1 >> unittestresults.out
 	gcov dominion.c -b >> unittestresults.out 
@@ -55,6 +55,10 @@ unittestresults: unittest1.c unittest2.c cardtest2.c dominion.o
 	gcc -o cardtest2 dominion.c rngs.c cardtest2.c $(CFLAGS)
 	./cardtest2 >> unittestresults.out
 	gcov dominion.c -b >> unittestresults.out 
+
+	gcc -o cardtest3 dominion.c rngs.c cardtest3.c $(CFLAGS)
+	./cardtest3 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out
 
 clean:
 	rm -f *.o playdom.exe playdom player player.exe  *.gcov *.gcda *.gcno *.so *.out testDrawCard testDrawCard.exe
