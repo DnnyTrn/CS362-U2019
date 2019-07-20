@@ -6,8 +6,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include <math.h>
 
 #define ASSERT(expr, error) \
     ((expr) ||              \
@@ -19,14 +17,6 @@ int cmpfunc(const void *a, const void *b)
 {
     return (*(int *)a - *(int *)b);
 }
-
-// void printArray(int *arr, int n)
-// {
-//     for (size_t i = 0; i < n; i++)
-//     {
-//         printf(" index %d element %d \n", i, arr[i]);
-//     }
-// }
 
 int main()
 {
