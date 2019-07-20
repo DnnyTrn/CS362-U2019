@@ -25,12 +25,11 @@ int main()
     printf("\n----------------- Testing : %s ----------------\n", TESTCARD);
     // initialization variables
     struct gameState g;
-    int numPlayers = 1, currentPlayer = 0, i, j, it, randomCard, testRun = 100;
+    int currentPlayer = 0, i, j, testRun = 100;
     int deckSize = 10;
     int similarDecks = 0;
     g.deckCount[0] = deckSize;
     int deckCopy[deckSize];
-    int dupilcateDeck[100] = {0};
     
     printf(" Test 1: checking cards in deck are same before and after shuffle\n");
     for (j = 0; j < testRun; j++)
