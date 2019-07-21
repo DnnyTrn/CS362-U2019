@@ -8,8 +8,8 @@
 #include <stdio.h>
 
 #define ASSERT(expr, error) \
-    ((expr) ||       \
-         printf("Assertion failed: %s\n", error))
+    ((expr) ||              \
+     printf("Assertion failed: %s\n", error))
 
 #define TESTCARD "baron"
 
@@ -29,7 +29,6 @@ int main()
     int preStateCoins = test_game.coins;       //coins = 4
     test_game.hand[currentPlayer][0] = estate; // player +1 estate for testing purposes
 
-
     // Test 1 playBaron() returns 0 for successful execution
     printf("Test 1: Testing playBaron() for execution\n");
     ASSERT(playBaron(&test_game, choice1, currentPlayer) == 0, "playBaron() did not return 0");
@@ -41,7 +40,7 @@ int main()
     ASSERT(buyCount == preStateBuy + 1 && buyCount == expectedBuyCount, "Test 2: FAILED ** BUY COUNT is not correct value");
 
     //  ** Choice 1 Testing (3 - 5): current player has -1 estate and +4 additional coins, game state has +1 estate. **
-    
+
     //Test 3: choice1 = 1 | player: +4 coins |
     int coinCount = test_game.coins;
     int expectedCoinCount = 8;
@@ -49,7 +48,7 @@ int main()
     ASSERT(coinCount == expectedCoinCount && preStateCoins + 4 == coinCount, "Test 3: FAILED ** COIN COUNT is not correct value");
 
     //Test 4: choice1 = 1 | player: -1 estate |
-    int estateCount = test_game.supplyCount[estate];
+    // int estateCount = test_game.supplyCount[estate];
     printf("Test 4: Checking player's estate count\n");
     ASSERT(test_game.hand[currentPlayer][0] != estate, "Test 4: FAILED ** ESTATE not discarded");
     // player should not have estate in hand (given from line 29)
@@ -71,16 +70,12 @@ int main()
     ASSERT(buyCount == preStateBuy + 1 && buyCount == expectedBuyCount, "Test 2: FAILED ** BUY COUNT is not correct value");
 
     //Test 7 check player estate count
-
     printf(" discard count count %d\n", test_game2.discardCount[currentPlayer]);
-     for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         printf("card: %d \n", test_game2.discard[currentPlayer][i]);
     }
 
-
-        //Test 8 check game state estate count
-        //Test 9 check player coins
-        printf("** Unit test 1 concluded.\n");
+    printf("** Unit test 1 concluded.\n");
     return 0;
 }
