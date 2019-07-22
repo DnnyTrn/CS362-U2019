@@ -58,9 +58,9 @@ int initializeGame(int numPlayers, int kingdomCards[10], int randomSeed,
     {
       for (j = 0; j < 10; j++)
         {
-	  if (j != i && kingdomCards[j] == kingdomCards[i])
-	    {
-	      return -1;
+            if (j != i && kingdomCards[j] == kingdomCards[i])
+            {
+                return -1;
 	    }
         }
     }
@@ -453,12 +453,14 @@ int scoreFor (int player, struct gameState *state) {
 
   return score;
 }
-
+/* Set array position of each player who won (remember ties!) to
+   1, others to 0 */
 int getWinners(int players[MAX_PLAYERS], struct gameState *state) {
   int i;	
   int j;
   int highScore;
   int currentPlayer;
+
 
   //get score for each player
   for (i = 0; i < MAX_PLAYERS; i++)
@@ -470,7 +472,9 @@ int getWinners(int players[MAX_PLAYERS], struct gameState *state) {
 	}
       else
 	{
-	  players[i] = scoreFor (i, state);
+
+        players[i] = scoreFor(i, state);
+        // printf(" player score %d \n", players[i]);
 	}
     }
 
@@ -519,7 +523,7 @@ int getWinners(int players[MAX_PLAYERS], struct gameState *state) {
 	}
     }
 
-  return 0;
+    return 0;
 }
 
 int drawCard(int player, struct gameState *state)
@@ -551,7 +555,7 @@ int drawCard(int player, struct gameState *state)
     count = state->handCount[player];//Get current player's hand count
     
     if (DEBUG){//Debug statements
-      printf("Current hand count: %d\n", count);
+    //   printf("Current hand count: %d\n", count);
     }
     
     deckCounter = state->deckCount[player];//Create a holder for the deck count
@@ -568,7 +572,7 @@ int drawCard(int player, struct gameState *state)
     int count = state->handCount[player];//Get current hand count for player
     int deckCounter;
     if (DEBUG){//Debug statements
-      printf("Current hand count: %d\n", count);
+    //   printf("Current hand count: %d\n", count);
     }
 
     deckCounter = state->deckCount[player];//Create holder for the deck count
@@ -832,55 +836,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
       return 0;
 		
     case minion:
-      //+1 action
-      state->numActions++;
-			
-      //discard card from hand
-      discardCard(handPos, currentPlayer, state, 0);
-			
-      if (choice1)		//+2 coins
-	{
-	  state->coins = state->coins + 2;
-	}
-			// 
-      else if (choice2)		//discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
-	{
-	  //discard hand
-	  while(numHandCards(state) > 0)
-	    {
-	      discardCard(handPos, currentPlayer, state, 0);
-	    }
-				
-	  //draw 4
-	  for (i = 0; i < 4; i++)
-	    {
-	      drawCard(currentPlayer, state);
-	    }
-				
-	  //other players discard hand and redraw if hand size > 4
-	  for (i = 0; i < state->numPlayers; i++)
-	    {
-	      if (i != currentPlayer)
-		{
-		  if ( state->handCount[i] > 4 )
-		    {
-		      //discard hand
-		      while( state->handCount[i] > 0 )
-			{
-			  discardCard(handPos, i, state, 0);
-			}
-							
-		      //draw 4
-		      for (j = 0; j < 4; j++)
-			{
-			  drawCard(i, state);
-			}
-		    }
-		}
-	    }
-				
-	}
-      return 0;
+        return playMinion(state, choice1, currentPlayer, handPos);
 		
     case steward:
       if (choice1 == 1)
@@ -1066,8 +1022,8 @@ int discardCard(int handPos, int currentPlayer, struct gameState *state, int tra
       //reduce number of cards in hand
       state->handCount[currentPlayer]--;
     }
-	
-  return 0;
+
+    return 0;
 }
 
 int gainCard(int supplyPos, struct gameState *state, int toFlag, int player)
@@ -1137,8 +1093,12 @@ int updateCoins(int player, struct gameState *state, int bonus)
   return 0;
 }
 
+// Baron is an action card that allows the player to discard an Estate card
+// in exchange for 4 coins, otherwise the player may gain an Estate card.
+// +1 Buy, -1 estate for +4 coins OR +1 estate
 int playBaron(struct gameState *state, int choice1, int currentPlayer){
     state->numBuys++; //Increase buys by 1!
+    // -1 Estate and +4 Coins
     if (choice1 > 0)
     {                               //Boolean true or going to discard an estate
         int p = 0;                  //Iterator for hand!
@@ -1157,6 +1117,7 @@ int playBaron(struct gameState *state, int choice1, int currentPlayer){
                 state->hand[currentPlayer][state->handCount[currentPlayer]] = -1;
                 state->handCount[currentPlayer]--;
                 card_not_discarded = 0; //Exit the loop
+                // code to increment game state estate count is missing 
             }
             else if (p > state->handCount[currentPlayer])
             {
@@ -1186,8 +1147,8 @@ int playBaron(struct gameState *state, int choice1, int currentPlayer){
 
     else
     {
-        gainCard(estate, state, 0, currentPlayer); //Gain an estate  - bug 1
-
+        int x = gainCard(estate, state, 0, currentPlayer); //Gain an estate  - bug 1
+        printf("choice2 gain a card %d\n", x);
         // if (supplyCount(estate, state) > 0)
         // {
         //     gainCard(estate, state, 0, currentPlayer); //Gain an estate
@@ -1202,19 +1163,19 @@ int playBaron(struct gameState *state, int choice1, int currentPlayer){
     return 0;
 }
 
-int playMinion(struct gameState *state, int choice1, int currentPlayer, int choice2, int handPos){
+int playMinion(struct gameState *state, int choice1, int currentPlayer, int handPos){
     //+1 action
     state->numActions++;
 
     //discard card from hand
     discardCard(handPos, currentPlayer, state, 0);
 
-    if (choice2) //+2 coins //bug 1
+    if (choice1 == 2) //+2 coins //bug 1 - choices are swapped
     {
         state->coins = state->coins + 2;
     }
 
-    else if (choice1) //discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
+    else if (choice1 == 1) //discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
     {
         //discard hand
         while (numHandCards(state) > 0)
@@ -1222,7 +1183,7 @@ int playMinion(struct gameState *state, int choice1, int currentPlayer, int choi
             discardCard(handPos, currentPlayer, state, 0);
         }
 
-        //draw 4 bug 2T
+        //draw 4 bug 2
         for (int i = 0; i < 5; i++)
         {
             drawCard(currentPlayer, state);
@@ -1388,12 +1349,12 @@ int playTribute(struct gameState *state, int nextPlayer, int *tributeRevealedCar
 }
 
 int playMine(struct gameState *state, int currentPlayer, int choice1, int choice2, int handPos) {
-    int j = state->hand[currentPlayer][choice2]; //store card we will trash bug 1
-    // int j = state->hand[currentPlayer][choice1]; //store card we will trash
-
+    // int j = state->hand[currentPlayer][choice2]; //store card we will trash bug 1
+    int j = state->hand[currentPlayer][choice1]; //store card we will trash
+    
     if (state->hand[currentPlayer][choice1] < copper || state->hand[currentPlayer][choice1] > gold)
     {
-        return -1;
+        return -1; 
     }
 
     if (choice2 > treasure_map || choice2 < curse)
@@ -1405,7 +1366,6 @@ int playMine(struct gameState *state, int currentPlayer, int choice1, int choice
     {
         return -1;
     }
-
     // gainCard(choice2, state, 2, currentPlayer); bug 2
 
     //discard card from hand
