@@ -28,7 +28,51 @@ unittest1: unittest1.c dominion.o
 	gcc -o unittest1 dominion.c rngs.c unittest1.c $(CFLAGS)
 	./unittest1 >> unittestresults.out
 	gcov dominion.c -b >> unittestresults.out 
+unittest2: unittest2.c dominion.o
+	gcc -o unittest2 dominion.c rngs.c unittest2.c $(CFLAGS)
+	./unittest2 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out 
+	
+unittest3: unittest3.c dominion.o
+	gcc -o unittest3 dominion.c rngs.c unittest3.c $(CFLAGS)
+	./unittest3 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out 
 
+unittest4: unittest4.c dominion.o
+	gcc -o unittest4 dominion.c rngs.c unittest4.c $(CFLAGS)
+	./unittest4 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out 
+	
+unittest5: unittest5.c dominion.o
+	gcc -o unittest5 dominion.c rngs.c unittest5.c $(CFLAGS)
+	./unittest5 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out 
+
+cardtest1: cardtest1.c dominion.o
+	gcc -o cardtest1 dominion.c rngs.c cardtest1.c $(CFLAGS)
+	./cardtest1 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out 
+
+cardtest2: cardtest2.c dominion.o
+	gcc -o cardtest2 dominion.c rngs.c cardtest2.c $(CFLAGS)
+	./cardtest2 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out 
+
+cardtest3: cardtest3.c dominion.o
+	gcc -o cardtest3 dominion.c rngs.c cardtest3.c $(CFLAGS)
+	./cardtest3 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out 
+
+cardtest4: cardtest4.c dominion.o
+	gcc -o cardtest4 dominion.c rngs.c cardtest4.c $(CFLAGS)
+	./cardtest4 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out 
+
+cardtest5: cardtest5.c dominion.o
+	gcc -o cardtest5 dominion.c rngs.c cardtest5.c $(CFLAGS)
+	./cardtest5 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out 
+	
 runtests: testDrawCard 
 	./testDrawCard &> unittestresult.out
 	gcov dominion.c >> unittestresult.out
@@ -39,13 +83,25 @@ player: player.c interface.o
 
 all: playdom player 
 
-unittestresults: unittest1.c unittest2.c cardtest1.c cardtest2.c cardtest3.c dominion.o
+unittestresults: unittest1.c unittest2.c unittest3.c unittest4.c unittest5.c cardtest1.c cardtest2.c cardtest3.c cardtest4.c cardtest5.c dominion.o
 	gcc -o unittest1 dominion.c rngs.c unittest1.c $(CFLAGS)
 	./unittest1 >> unittestresults.out
 	gcov dominion.c -b >> unittestresults.out 
 
 	gcc -o unittest2 dominion.c rngs.c unittest2.c $(CFLAGS)
 	./unittest2 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out 
+
+	gcc -o unittest3 dominion.c rngs.c unittest3.c $(CFLAGS)
+	./unittest3 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out 
+
+	gcc -o unittest4 dominion.c rngs.c unittest4.c $(CFLAGS)
+	./unittest4 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out 
+
+	gcc -o unittest5 dominion.c rngs.c unittest5.c $(CFLAGS)
+	./unittest5 >> unittestresults.out
 	gcov dominion.c -b >> unittestresults.out 
 
 	gcc -o cardtest1 dominion.c rngs.c cardtest1.c $(CFLAGS)
@@ -58,6 +114,14 @@ unittestresults: unittest1.c unittest2.c cardtest1.c cardtest2.c cardtest3.c dom
 
 	gcc -o cardtest3 dominion.c rngs.c cardtest3.c $(CFLAGS)
 	./cardtest3 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out
+
+	gcc -o cardtest4 dominion.c rngs.c cardtest4.c $(CFLAGS)
+	./cardtest4 >> unittestresults.out
+	gcov dominion.c -b >> unittestresults.out
+
+	gcc -o cardtest5 dominion.c rngs.c cardtest5.c $(CFLAGS)
+	./cardtest5 >> unittestresults.out
 	gcov dominion.c -b >> unittestresults.out
 
 clean:
