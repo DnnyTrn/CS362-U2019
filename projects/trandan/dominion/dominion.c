@@ -58,9 +58,9 @@ int initializeGame(int numPlayers, int kingdomCards[10], int randomSeed,
     {
       for (j = 0; j < 10; j++)
         {
-	  if (j != i && kingdomCards[j] == kingdomCards[i])
-	    {
-	      return -1;
+            if (j != i && kingdomCards[j] == kingdomCards[i])
+            {
+                return -1;
 	    }
         }
     }
@@ -453,12 +453,14 @@ int scoreFor (int player, struct gameState *state) {
 
   return score;
 }
-
+/* Set array position of each player who won (remember ties!) to
+   1, others to 0 */
 int getWinners(int players[MAX_PLAYERS], struct gameState *state) {
   int i;	
   int j;
   int highScore;
   int currentPlayer;
+
 
   //get score for each player
   for (i = 0; i < MAX_PLAYERS; i++)
@@ -470,7 +472,9 @@ int getWinners(int players[MAX_PLAYERS], struct gameState *state) {
 	}
       else
 	{
-	  players[i] = scoreFor (i, state);
+
+        players[i] = scoreFor(i, state);
+        // printf(" player score %d \n", players[i]);
 	}
     }
 
@@ -519,7 +523,7 @@ int getWinners(int players[MAX_PLAYERS], struct gameState *state) {
 	}
     }
 
-  return 0;
+    return 0;
 }
 
 int drawCard(int player, struct gameState *state)
@@ -1018,8 +1022,8 @@ int discardCard(int handPos, int currentPlayer, struct gameState *state, int tra
       //reduce number of cards in hand
       state->handCount[currentPlayer]--;
     }
-	
-  return 0;
+
+    return 0;
 }
 
 int gainCard(int supplyPos, struct gameState *state, int toFlag, int player)
@@ -1345,12 +1349,12 @@ int playTribute(struct gameState *state, int nextPlayer, int *tributeRevealedCar
 }
 
 int playMine(struct gameState *state, int currentPlayer, int choice1, int choice2, int handPos) {
-    int j = state->hand[currentPlayer][choice2]; //store card we will trash bug 1
-    // int j = state->hand[currentPlayer][choice1]; //store card we will trash
-
+    // int j = state->hand[currentPlayer][choice2]; //store card we will trash bug 1
+    int j = state->hand[currentPlayer][choice1]; //store card we will trash
+    
     if (state->hand[currentPlayer][choice1] < copper || state->hand[currentPlayer][choice1] > gold)
     {
-        return -1;
+        return -1; 
     }
 
     if (choice2 > treasure_map || choice2 < curse)
@@ -1362,7 +1366,6 @@ int playMine(struct gameState *state, int currentPlayer, int choice1, int choice
     {
         return -1;
     }
-
     // gainCard(choice2, state, 2, currentPlayer); bug 2
 
     //discard card from hand
