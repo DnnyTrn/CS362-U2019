@@ -5,6 +5,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+#define branchCounter(i) printf(" branch %d \n", i )
+
 int compare(const void* a, const void* b) {
   if (*(int*)a > *(int*)b)
     return 1;
@@ -43,7 +45,7 @@ int initializeGame(int numPlayers, int kingdomCards[10], int randomSeed,
   //set up random number generator
   SelectStream(1);
   PutSeed((long)randomSeed);
-  
+
   //check number of players
   if (numPlayers > MAX_PLAYERS || numPlayers < 2)
     {
@@ -1138,15 +1140,19 @@ int updateCoins(int player, struct gameState *state, int bonus)
 }
 
 int playBaron(struct gameState *state, int choice1, int currentPlayer){
+    int c = 0;
     state->numBuys++; //Increase buys by 1!
     if (choice1 > 0)
     {                               //Boolean true or going to discard an estate
+        branchCounter(++c);
         int p = 0;                  //Iterator for hand!
         int card_not_discarded = 1; //Flag for discard set!
         while (card_not_discarded)
         {
             if (state->hand[currentPlayer][p] == estate)
             {                      //Found an estate card!
+                branchCounter(++c);
+
                 state->coins += 4; //Add 4 coins to the amount of coins
                 state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][p];
                 state->discardCount[currentPlayer]++;

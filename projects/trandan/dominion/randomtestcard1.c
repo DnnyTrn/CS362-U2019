@@ -13,17 +13,17 @@
     ((expr) ||              \
      printf("Assertion failed: %s\n", error))
 
-#define TESTCARD "baron()"
+#define TESTCARD "baron"
 
 int main()
 {
     printf("\n----------------- Testing : %s ----------------\n", TESTCARD);
     // initialization variables
     struct gameState g;
-    int numPlayers = 4, i, j, testRun = 1000;
+    int numPlayers = 4, i, j, choice1 = 1, testRun = 1000;
     int currentPlayer = 0;
     srand(time(0));
-
+    playBaron(&g, choice1, currentPlayer);
    
 
     printf("** Random test card 1 concluded. **\n");
