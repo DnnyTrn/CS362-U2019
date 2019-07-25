@@ -5,8 +5,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define branchCounter(i) printf(" branch %d \n", i )
-
 int compare(const void* a, const void* b) {
   if (*(int*)a > *(int*)b)
     return 1;
@@ -320,7 +318,7 @@ int handCard(int handPos, struct gameState *state) {
 }
 
 int supplyCount(int card, struct gameState *state) {
-  return state->supplyCount[card];
+    return state->supplyCount[card];
 }
 
 int fullDeckCount(int player, int card, struct gameState *state) {
@@ -1081,21 +1079,20 @@ int gainCard(int supplyPos, struct gameState *state, int toFlag, int player)
     {
       return -1;
     }
-	
-  //added card for [whoseTurn] current player:
-  // toFlag = 0 : add to discard
-  // toFlag = 1 : add to deck
-  // toFlag = 2 : add to hand
+    //added card for [whoseTurn] current player:
+    // toFlag = 0 : add to discard
+    // toFlag = 1 : add to deck
+    // toFlag = 2 : add to hand
 
-  if (toFlag == 1)
+    if (toFlag == 1)
     {
       state->deck[ player ][ state->deckCount[player] ] = supplyPos;
       state->deckCount[player]++;
     }
   else if (toFlag == 2)
     {
-      state->hand[ player ][ state->handCount[player] ] = supplyPos;
-      state->handCount[player]++;
+        state->hand[player][state->handCount[player]] = supplyPos;
+        state->handCount[player]++;
     }
   else
     {
@@ -1105,7 +1102,6 @@ int gainCard(int supplyPos, struct gameState *state, int toFlag, int player)
 	
   //decrease number in supply pile
   state->supplyCount[supplyPos]--;
-	 
   return 0;
 }
 
@@ -1140,19 +1136,15 @@ int updateCoins(int player, struct gameState *state, int bonus)
 }
 
 int playBaron(struct gameState *state, int choice1, int currentPlayer){
-    int c = 0;
     state->numBuys++; //Increase buys by 1!
-    if (choice1 > 0)
+    if (choice1 == 1)
     {                               //Boolean true or going to discard an estate
-        branchCounter(++c);
         int p = 0;                  //Iterator for hand!
         int card_not_discarded = 1; //Flag for discard set!
         while (card_not_discarded)
         {
             if (state->hand[currentPlayer][p] == estate)
             {                      //Found an estate card!
-                branchCounter(++c);
-
                 state->coins += 4; //Add 4 coins to the amount of coins
                 state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][p];
                 state->discardCount[currentPlayer]++;
@@ -1171,10 +1163,11 @@ int playBaron(struct gameState *state, int choice1, int currentPlayer){
                     printf("No estate cards in your hand, invalid choice\n");
                     printf("Must gain an estate if there are any\n");
                 }
+
                 if (supplyCount(estate, state) > 0)
                 {
                     gainCard(estate, state, 0, currentPlayer);
-                    state->supplyCount[estate]++; //Decrement estates bug 2
+                    // state->supplyCount[estate]--; //Decrement estates
                     if (supplyCount(estate, state) == 0)
                     {
                         isGameOver(state);
@@ -1192,17 +1185,15 @@ int playBaron(struct gameState *state, int choice1, int currentPlayer){
 
     else
     {
-        gainCard(estate, state, 0, currentPlayer); //Gain an estate  - bug 1
-
-        // if (supplyCount(estate, state) > 0)
-        // {
-        //     gainCard(estate, state, 0, currentPlayer); //Gain an estate
-        //     state->supplyCount[estate]--;              //Decrement Estates
-        //     if (supplyCount(estate, state) == 0)
-        //     {
-        //         isGameOver(state);
-        //     }
-        // }
+        if (supplyCount(estate, state) > 0)
+        {
+            {
+            gainCard(estate, state, 0, currentPlayer); //Gain an estate
+            // state->supplyCount[estate]--;              //Decrement Estates
+            if (supplyCount(estate, state) == 0)
+                isGameOver(state);
+            }
+        }
     }
 
     return 0;
