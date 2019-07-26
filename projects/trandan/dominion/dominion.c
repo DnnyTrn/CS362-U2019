@@ -1199,19 +1199,19 @@ int playBaron(struct gameState *state, int choice1, int currentPlayer){
     return 0;
 }
 
-int playMinion(struct gameState *state, int choice1, int currentPlayer, int handPos){
+int playMinion(struct gameState *state, int choice1, int choice2, int currentPlayer, int handPos){
     //+1 action
     state->numActions++;
 
     //discard card from hand
     discardCard(handPos, currentPlayer, state, 0);
 
-    if (choice1 == 0) //+2 coins //bug 1
+    if (choice2) //+2 coins //bug 1
     {
         state->coins = state->coins + 2;
     }
 
-    else if (choice1 == 1) //discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
+    else if (choice1) //discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
     {
         //discard hand
         while (numHandCards(state) > 0)
