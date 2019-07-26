@@ -129,7 +129,7 @@ int getWinners(int players[MAX_PLAYERS], struct gameState *state);
    1, others to 0 */
 
 int playBaron(struct gameState *state, int choice1, int currentPlayer);
-int playMinion(struct gameState *state, int choice1, int currentPlayer, int handPos);
+int playMinion(struct gameState *state, int choice1, int choice2, int currentPlayer, int handPos);
 int playAmbassador(struct gameState *state, int choice1, int currentPlayer, int choice2, int handPos);
 int playTribute(struct gameState *state, int nextPlayer, int *tributeRevealedCards, int currentPlayer);
 int playMine(struct gameState *state, int currentPlayer, int choice1, int choice2, int handPos);
