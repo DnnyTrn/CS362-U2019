@@ -1,3 +1,5 @@
+// Danny Tran
+// CS 362 * Assignment 4 * Random Test Card 3 (tribute)
 // to compile this file
 // gcc -o randomtestcard3 dominion.c rngs.c randomtestcard3.c -Wall -fpic -coverage -lm -std=c99
 
@@ -21,14 +23,16 @@ int asserttrue(int expr, char *error)
 {
     if (!expr)
     {
-        if(DEBUG) printf("Assertion failed: %s\n", error);
+        if (DEBUG)
+            printf("Assertion failed: %s\n", error);
         return 1;
     }
     return 0;
 }
 
 // keeps track of individual test failures
-struct testCount {
+struct testCount
+{
     int coinTest;
     int deckTest;
     int handTest;
@@ -37,7 +41,8 @@ struct testCount {
 };
 
 // initalize testCount struct members to 0
-int testInit(struct testCount *t){
+int testInit(struct testCount *t)
+{
     t->actionsTest = 0;
     t->deckTest = 0;
     t->handTest = 0;
@@ -47,12 +52,14 @@ int testInit(struct testCount *t){
 }
 
 // returns number of tests failed in struct testCount and updates the testCount member testsFailed
-int updateTestFailCount(struct testCount *t){
-    return t->testsFailed = t->actionsTest + t->deckTest +  t->handTest +  t->coinTest;
+int updateTestFailCount(struct testCount *t)
+{
+    return t->testsFailed = t->actionsTest + t->deckTest + t->handTest + t->coinTest;
 }
 
 // prints the count of tests failed
-void printTestCount(struct testCount *t){
+void printTestCount(struct testCount *t)
+{
     printf(" Deck Test failed: %d \n", t->deckTest);
     printf(" Hand Test failed: %d \n", t->handTest);
     printf(" Coin Test failed: %d \n", t->coinTest);
@@ -97,15 +104,14 @@ int checkPlayTribute(struct gameState *post, int nextPlayer, int *tributeReveale
     return 0;
 }
 
-
 int main()
 {
     printf("\n----------------- Testing : %s ----------------\n", TESTCARD);
     // initialization variables
     struct gameState g;
-    struct testCount t; 
+    struct testCount t;
     testInit(&t);
-    int i, j, n, testRun = 91000, currentPlayer, nextPlayer;
+    int i, j, n, testRun = 100000, currentPlayer, nextPlayer;
     int tributedRevealedCards[] = {};
     srand(time(0));
     for (n = 0; n < testRun; n++)
@@ -135,7 +141,7 @@ int main()
         // reduces deckCount test failures to 0 since randomizing current and nextPlayer goes against the logic of Tribute card
         // currentPlayer = 0;
         // nextPlayer = 1;
-        
+
         // randomize current and nextPlayer (goes against Tribute logic)
         currentPlayer = rand() % MAX_PLAYERS;
         nextPlayer = rand() % MAX_PLAYERS;
@@ -153,12 +159,14 @@ int main()
             nextPlayer++;
 
         checkPlayTribute(&g, nextPlayer, tributedRevealedCards, currentPlayer, &t);
-
     }
 
     updateTestFailCount(&t);
+    printf(" Tests Ran: %d \n", testRun);
     printf(" Tests Failed: %d \n", t.testsFailed);
     printTestCount(&t);
+    double failPercent = (double)t.testsFailed / (double)testRun * 100;
+    printf(" Percent of tests failed %0.4lf%% \n", failPercent );
     printf("** Random test card 3 concluded. **\n");
     return 0;
 }

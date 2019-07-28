@@ -1,3 +1,5 @@
+// Danny Tran
+// CS 362 * Assignment 4 * Random Test Card 1 (baron)
 // to compile this file
 // gcc -o randomtestcard1 dominion.c rngs.c randomtestcard1.c -Wall -fpic -coverage -lm -std=c99
 // ./randomtestcard1
@@ -6,8 +8,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <time.h>
+
+#define TESTCARD "baron"
 
 #define ASSERT(expr, error) \
     ((expr) ||              \
@@ -22,7 +25,6 @@ int asserttrue(int expr, char *error)
     }
     return 0;
 }
-#define TESTCARD "baron"
 
 // test oracle for playBaron
 int checkPlayBaron(struct gameState *post, int currentPlayer, int choice1, int estateHandPosition)
@@ -66,7 +68,7 @@ int main()
     printf("\n----------------- Testing : %s ----------------\n", TESTCARD);
     // initialization variables
     struct gameState g;
-    int i, n, handCount, choice1, estateHandPosition = -1, testRun = 10000, testsFailed = 0;
+    int i, n, handCount, choice1, estateHandPosition = -1, testRun = 100000, testsFailed = 0;
     int currentPlayer = 0;
     srand(time(0));
 
@@ -79,9 +81,9 @@ int main()
 
         choice1 = rand() % 2;
         currentPlayer = rand() % MAX_PLAYERS;
-        g.supplyCount[estate] = rand() % 13 + 1; //supply count can be up to 12 per dom. rules
+        g.supplyCount[estate] = rand() % MAX_DECK + 1; 
         g.discardCount[currentPlayer] = rand() % MAX_DECK;
-        g.handCount[currentPlayer] = rand() % 11;
+        g.handCount[currentPlayer] = rand() % MAX_HAND;
         handCount = g.handCount[currentPlayer];
 
         // 1 in 4 chances that the player will have an estate in their hand
@@ -111,7 +113,10 @@ int main()
 
         testsFailed += checkPlayBaron(&g, currentPlayer, choice1, estateHandPosition);
     }
+    printf(" Tests Ran: %d \n", testRun);
     printf(" Tests Failed: %d \n", testsFailed);
+    double failPercent = (double)testsFailed / (double)testRun * 100;
+    printf(" Percent of tests failed %0.4lf%% \n", failPercent);
     printf("** Random test card 1 concluded. **\n");
     return 0;
 }
