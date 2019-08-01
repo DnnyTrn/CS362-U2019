@@ -1,274 +1,181 @@
+// Danny Tran
+// CS 362 * Assignment 4 * Random Test Card 2 (minion)
+// to compile this file
+// gcc -o randomtestcard2 dominion.c rngs.c randomtestcard2.c -Wall -fpic -coverage -lm -std=c99
+// ./randomtestcard2
+// gcov dominion -b
 #include "dominion.h"
 #include "dominion_helpers.h"
+#include "rngs.h"
 #include <string.h>
 #include <stdio.h>
-#include <assert.h>
-#include "rngs.h"
 #include <stdlib.h>
 #include <time.h>
 
 #define TESTCARD "minion"
+// Assert for printing error messages, but can slow down testing
+#define ASSERT(expr, error) \
+    ((expr) ||              \
+     printf("Assertion failed: %s\n", error))
 
-int main() {
-    int newCards = 0;
-    int discarded = 1;
-    int xtraCoins = 0;
-    int xtraAction = 0;
-    int draw = 0;
-    int shuffledCards = 0;
-
-    int i, j, m;
-    int handpos = 0, choice1 = 0, choice2 = 0, choice3 = 0, bonus = 0;
-    int remove1, remove2;
-    int seed = 1000;
-    int numPlayers = 2;
-    int thisPlayer = 0;
-    int handCount = 5;
-    struct gameState G, testG;
-    int k[10] = {adventurer, embargo, village, minion, mine, cutpurse,
-            sea_hag, tribute, smithy, council_room};
-    int exception[] = {-1};
-    int numberOfEstate;
-
-    // initialize a game state and player cards
-    initializeGame(numPlayers, k, seed, &G);
-
-    // seeding
-    srand(time(NULL));
-
-    printf("----------------- Testing Card: %s ----------------\n", TESTCARD);
- 
-    for ( m = 1; m <= 100 ; m++){
-        printf("---------------- Run %d ----------------\n",m);
-
-        // gain 2 coins
-        choice1 = rand()%2;
-
-        // discard hand and draw 4
-        choice2 = rand()%2;
-        
-        // set gameState to random byte 
-        for ( i = 0; i < sizeof(struct gameState);i++ ){
-            ((char*)&G)[i] = floor(rand()*256);
-        }
-
-        // set number of player
-        G.numPlayers = rand()%3 + 2;
-
-        // set hand count, deck count, and discard count
-        for ( i = 0 ; i < G.numPlayers ; i++){
-            if ( i == thisPlayer)
-                G.handCount[i] = rand()%MAX_HAND+1;
-            else
-                G.handCount[i] = rand()%2+4;   // for other players, limit the subset as boundary case
-
-            G.deckCount[i] = rand()%(MAX_DECK+1);
-            G.discardCount[i] = rand()%(MAX_DECK+1);
-        }
-
-        // set current player's coins
-        G.coins = rand()%(60+1)*1 + rand()%(40+1)*3 + rand()%(30+1)*6;
-
-        // set current player's action
-        G.numActions = rand()%10; 
-
-        // set hand card randomly with exception
-        assignRandomCardToHand(&G, thisPlayer, exception);
-
-        // set the playing minion card to a random hand position
-        handpos = assignPlayCardToRandomPos(&G, thisPlayer, minion);
-
-        // make a copy for comprasion
-        memcpy(&testG, &G, sizeof(struct gameState));
-
-        // lets call the function
-        //minionEffect(&testG, choice1, thisPlayer);
-        minionEffect(&testG, choice1, choice2, handpos, thisPlayer);
-
-        // assertion
-        printf("choice1 = %d | choice2 = %d \n", choice1, choice2);
-        printf("Total players = %d\n", G.numPlayers);
-        for ( i = 0; i < G.numPlayers ; i++ ){
-            if ( i == thisPlayer)
-                printf("Current player: player[%d] handCount = %d \n", i, G.handCount[i]);
-            else
-                printf("Other player: player[%d] handCount = %d \n", i, G.handCount[i]);
-        }
-        printf("\n");
-
-        if ( choice1 == 1){
-            xtraCoins = 2;
-            xtraAction = 1;
-            printf("coins = %d, expected = %d\n", testG.coins, G.coins + xtraCoins);
-            printAssert(testG.coins == G.coins + xtraCoins);
-
-            printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] - discarded);
-            printAssert(testG.handCount[thisPlayer] == (G.handCount[thisPlayer] - discarded));
-
-            printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer]);
-            printAssert(testG.deckCount[thisPlayer] == G.deckCount[thisPlayer]);
-
-            printf("discard count = %d, expected = %d\n", testG.discardCount[thisPlayer], G.discardCount[thisPlayer] + discarded);
-            printAssert(testG.discardCount[thisPlayer] == G.discardCount[thisPlayer] + discarded);
-
-            printf("number of action = %d, expected = %d\n", testG.numActions, G.numActions + xtraAction);
-            printAssert(testG.numActions == G.numActions + xtraAction);
-        }
-        else if (choice2 == 1){
-            for( i = 0; i < G.numPlayers ; i++ ){
-                // current player
-                if ( i == thisPlayer){
-                    xtraAction = 1;                 // from the effect
-                    discarded = testG.handCount[i]; // discard hand
-                    draw = 4;                       // from the effect
-                    printf("# current player# \n");
-                    printf("current player (player[0]): number of action = %d, expected = %d\n", testG.numActions, G.numActions + xtraAction);
-                    printAssert(testG.numActions == G.numActions + xtraAction);
-                    
-                    printf("current player (player[0]): hand count = %d, expected = %d\n", testG.handCount[thisPlayer], draw);
-                    printAssert(testG.handCount[thisPlayer] == draw);
-
-                    printf("current player (player[0]): deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer] - draw);
-                    printAssert(testG.deckCount[thisPlayer] == G.deckCount[thisPlayer] - draw);
-                    
-                    printf("current player (player[0]): coins = %d, expected = %d\n", testG.coins, G.coins);
-                    printAssert(testG.coins == G.coins);
-
-                    printf("current player (player[0]): dicard count = %d, expected = %d\n", testG.discardCount[thisPlayer], G.discardCount[thisPlayer] + discarded);
-                    printAssert(testG.discardCount[thisPlayer] == G.discardCount[thisPlayer] + discarded);
-                }
-                // other player who has handCount >= 5
-                else if ( G.handCount[i] >= 5 ){
-                    draw = 4;       // from the effect
-                    discarded = testG.handCount[i];
-                    printf("# other player who has 5 cards on hand # \n");
-                    printf("other player (player[%d]): hand count = %d, expected = %d\n", i, testG.handCount[3], draw);
-                    printAssert(testG.handCount[i] == draw);
-
-                    printf("other player (player[%d]): deck count = %d, expected = %d\n", i, testG.deckCount[3], G.deckCount[3] - draw);
-                    printAssert(testG.deckCount[i] == G.deckCount[i] - draw);
-
-                    printf("other player (player[%d]): dicard count = %d, expected = %d\n", i, testG.discardCount[3], G.discardCount[3] + discarded);
-                    printAssert(testG.discardCount[i] == G.discardCount[i] + discarded);
-                }
-                // other player who has handCount <= 4
-                else if ( G.handCount[i] <= 4){
-                    discarded = 0;
-                    printf("# other player who has 4 cards on hand # \n");
-                    printf("other player (player[%d]): hand count = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i]);
-                    printAssert(testG.handCount[i] == G.handCount[i]);
-
-                    printf("other player (player[%d]): deck count = %d, expected = %d\n", i, testG.deckCount[i], G.deckCount[i]);
-                    printAssert(testG.deckCount[i] == G.deckCount[i]);
-
-                    printf("other player (player[%d]): dicard count = %d, expected = %d\n", i, testG.discardCount[i], G.discardCount[i] + discarded);
-                    printAssert(testG.discardCount[i] == G.discardCount[i] + discarded);
-                }
-            }
-        }
+// returns 1 if expression is false, and prints the passed error message
+// function can be coupled to keep track of test failures
+int asserttrue(int expr, char *error)
+{
+    if (!expr)
+    {
+        if (DEBUG)
+            printf("Assertion failed: %s\n", error);
+        return 1;
     }
-
-    printf("\n >>>>> Testing complete %s <<<<<\n\n", TESTCARD);
-
-
     return 0;
 }
+// keeps track of individual test failures
+struct testCount
+{
+    int coinTest;
+    int deckTest;
+    int discardTest;
+    int handTest;
+    int actionsTest;
+    int testsFailed;
+};
 
-void printAssert(int flag){
-    if(flag) printf("Passed\n-\n");
-    else printf("Failed\n-\n");
+// initalize testCount struct members to 0
+int testInit(struct testCount *t)
+{
+    t->actionsTest = 0;
+    t->deckTest = 0;
+    t->discardTest = 0;
+    t->handTest = 0;
+    t->coinTest = 0;
+    t->testsFailed = 0;
+    return 0;
+}
+// returns number of tests failed in struct testCount and updates the testCount member testsFailed
+int updateTestFailCount(struct testCount *t)
+{
+    return t->testsFailed = t->actionsTest + t->deckTest + t->handTest + t->coinTest + t->discardTest;
 }
 
-void setHandCards(struct gameState *G, int player, int card1, int card2, int card3, int card4, int card5){
-    G->hand[player][0]=card1;
-    G->hand[player][1]=card2;
-    G->hand[player][2]=card3;
-    G->hand[player][3]=card4;
-    G->hand[player][4]=card5;
+// prints the count of tests failed
+void printTestCount(struct testCount *t)
+{
+    printf(" Deck Count Test failed: %d \n", t->deckTest);
+    printf(" Hand Count Test failed: %d \n", t->handTest);
+    printf(" Coin Test failed: %d \n", t->coinTest);
+    printf(" Action Test failed: %d \n", t->actionsTest);
 }
 
-int assignRandomCardToHand(struct gameState *G, int player, int exception[], int playingCard){
+// test oracle for playBaron
+int checkPlayMinion(struct gameState *post, int choice1, int choice2, int currentPlayer, int handPos, struct testCount *t)
+{
+    struct gameState pre;
     int i, j;
-    int randomCard;
-    int exceptionFlag;
-    //if (exception[0] != -1)
-    size_t n = sizeof(exception)/sizeof(exception[0]);
+    memcpy(&pre, post, sizeof(struct gameState));
+    ASSERT(memcmp(&pre, post, sizeof(struct gameState)) == 0, "memcpy failed coping pre and post states");
+    ASSERT(playMinion(post, choice1, choice2, currentPlayer, handPos) == 0, "playMinion did not return 0");
 
-    //printf("here!!! n = %d \n\n", n);
-
-    for ( i = 0; i < G->handCount[player] ; i++ ){  
-       //printf("inside for loop!!!\n\n");
-       do{
-            //printf("inside while loop!!!\n\n");
-            exceptionFlag = 0;
-            randomCard = rand() % (treasure_map+1);
-            //printf("randomCard = %d", randomCard);
-            for( j = 0 ; j < n ; j++){
-                if (randomCard == exception[j]){
-                    exceptionFlag = 1;
-                    break;
+    pre.numActions++;
+    discardCard(handPos, currentPlayer, &pre, 0);
+    if (choice2)
+    {
+        pre.coins = pre.coins + 2;
+    }
+    else if (choice1)
+    {
+        while (pre.handCount[currentPlayer] > 0)
+        {
+            pre.handCount[currentPlayer]--;
+        }
+        for (i = 0; i < 4; i++)
+        {
+            drawCard(currentPlayer, &pre);
+        }
+        for (i = 0; i < pre.numPlayers; i++)
+        {
+            if (i != currentPlayer)
+            {
+                if (pre.handCount[i] > 4)
+                {
+                    while (pre.handCount[i] > 0)
+                    {
+                        discardCard(handPos, i, &pre, 0);
+                    }
+                    for (j = 0; j < 4; j++)
+                    {
+                        drawCard(i, &pre);
+                    }
                 }
             }
-       }while(exceptionFlag);
-
-       // random is not the one in exceptinon; assign it to the hand
-       G->hand[player][i] = randomCard;
-
+        }
     }
 
-    //printf("end of assignRandomCardToHand!!!\n\n");
+    t->coinTest += asserttrue(pre.coins == post->coins, "coins are different");
+    t->actionsTest += asserttrue(pre.numActions == post->numActions, "numActions are different");
+    for (i = 0; i < MAX_PLAYERS; i++)
+    {
+        t->discardTest += asserttrue(pre.discardCount[i] == post->discardCount[i], "discard count are different");
+        t->deckTest += asserttrue(pre.deckCount[i] == post->deckCount[i], "deckCounts are different");
+        t->handTest += asserttrue(pre.handCount[i] == post->handCount[i], "handCounts are different");
+    }
+    return 0;
 }
+int main()
+{
+    printf("\n----------------- Testing : %s ----------------\n", TESTCARD);
+    // initialization variables
+    struct gameState g;
+    struct testCount t;
+    testInit(&t);
 
-int assignPlayCardToRandomPos(struct gameState *G, int player, int playingCard){
-    int handPos = rand()%G->handCount[player];
-    G->hand[player][handPos] = playingCard;
-    return handPos;
-}
-
-void assignSpecificCardToHand(struct gameState *G, int player, int numberOfCard, int card){
-    int count;
-    int collision;
-    int index;
-
-    if (G->handCount[player] <= 1)
-        return;
-
-    if (numberOfCard > G->handCount[player])
-        numberOfCard = G->handCount[player]-1;
-
-    for( count = 0 ; count < numberOfCard ; count++ ){
-        do{
-            collision = 0;
-            index = rand()%G->handCount[player];
-            //printf("index = %d \n", index);
-            //printf("handcount = %d\n",G->handCount[player]);
-            //printf("card[0]=%d\n", G->hand[player][0]);
-            //printf("card[1]=%d\n", G->hand[player][1]);            
-            //printHand(G,player);
-            if ( G->hand[player][index] == card ) {
-                collision = 1;
-                //printf("collision\n");
-                //printf(" G->hand[player][index] = %d, card = %d \n\n", G->hand[player][index], card);
+    int i, n, j, k, handCount, choice1, choice2, handPos, testRun = 100000;
+    int currentPlayer = 0;
+    srand(time(0));
+    for (n = 0; n < testRun; n++)
+    {
+        for (i = 0; i < sizeof(struct gameState); i++)
+        {
+            ((char *)&g)[i] = rand() % 256;
+        }
+        for (j = 0; j < MAX_PLAYERS; j++)
+        {
+            // randomize hand, deck and discards for 4 players to numbers 0 - 255
+            for (k = 0; k < MAX_DECK; k++)
+            {
+                g.hand[j][k] = rand() % 256;
+                g.deck[j][k] = rand() % 256;
+                g.discard[j][k] = rand() % 256;
             }
+            g.handCount[j] = rand() % MAX_DECK;
+            g.deckCount[j] = rand() % MAX_DECK;
+            g.discardCount[j] = rand() % MAX_DECK;
+        }
+        choice1 = rand() % 256;
+        choice2 = rand() % 256;
+        currentPlayer = rand() % MAX_PLAYERS;
+        g.whoseTurn = currentPlayer;
+        g.playedCardCount = 0;
+        g.numPlayers = MAX_PLAYERS;
 
-        }while(collision);
+        handCount = g.handCount[currentPlayer];
+        //set handPos
+        if (handCount == 0)
+        {
+            handPos = 0;
+        }
+        else
+            handPos = rand() % handCount;
 
-        G->hand[player][index] = card;
+        checkPlayMinion(&g, choice1, choice2, currentPlayer, handPos, &t);
     }
-}
 
-int getSpecificHandCount(struct gameState *G, int player, int card){
-    int count = 0;
-    int i;
-    for(i = 0 ; i < 5; i++){
-        if(G->hand[player][i] == card) count++;
-    }
-    return card;
-}
-
-int printHand(struct gameState *G, int player){
-    int i;
-    for (i = 0; i < G->handCount[player] ; i++){
-        printf("G.hand[%d][%d] = %d \n\n", player, i, G->hand[player][i]);
-    }
+    updateTestFailCount(&t);
+    printf(" Tests Ran: %d \n", testRun);
+    printf(" Tests Failed: %d \n", t.testsFailed);
+    printTestCount(&t);
+    double failPercent = (double)t.testsFailed / (double)testRun * 100;
+    printf(" Percent of tests failed %0.4lf%% \n", failPercent);
+    printf("** Random test card 2 concluded. **\n");
+    return 0;
 }

@@ -1,220 +1,122 @@
+// Danny Tran
+// CS 362 * Assignment 4 * Random Test Card 1 (baron)
+// to compile this file
+// gcc -o randomtestcard1 dominion.c rngs.c randomtestcard1.c -Wall -fpic -coverage -lm -std=c99
+// ./randomtestcard1
+// gcov dominion -b
 #include "dominion.h"
-#include "dominion_helpers.h"
 #include <string.h>
 #include <stdio.h>
-#include <assert.h>
-#include "rngs.h"
 #include <stdlib.h>
 #include <time.h>
 
 #define TESTCARD "baron"
 
-int main() {
-    int newCards = 0;
-    int discarded = 1;
-    int xtraCoins = 0;
-    int shuffledCards = 0;
+#define ASSERT(expr, error) \
+    ((expr) ||              \
+     printf("Assertion failed: %s\n", error))
 
-    int i, j, m;
-    int handpos = 0, choice1 = 0, choice2 = 0, choice3 = 0, bonus = 0;
-    int remove1, remove2;
-    int seed = 1000;
-    int numPlayers = 2;
-    int thisPlayer = 0;
-    int handCount = 5;
-    struct gameState G, testG;
-    int k[10] = {adventurer, embargo, village, minion, mine, cutpurse,
-            sea_hag, tribute, smithy, council_room};
-    int exception[] = {estate};
-    int numberOfEstate;
-
-    // initialize a game state and player cards
-    initializeGame(numPlayers, k, seed, &G);
-
-    // seeding
-    srand(time(NULL));
-
-    printf("----------------- Testing Card: %s ----------------\n", TESTCARD);
- 
-    for ( m = 1; m <= 50 ; m++){
-        printf("---------------- Run %d ----------------\n",m);
-
-
-        choice1 = rand()%2;
-        
-
-        // set gameState to random byte 
-        for ( i = 0; i < sizeof(struct gameState);i++ ){
-            ((char*)&G)[i] = floor(rand()*256);
-        }
-
-        // set number of player
-        G.numPlayers = rand()%3 + 2;
-
-        // set the supply of estate
-        G.supplyCount[estate] = rand()%(12+1);
-
-        // set hand count
-        G.handCount[thisPlayer] = rand()%MAX_HAND+1;
-
-        // set deck count
-        G.deckCount[thisPlayer] = rand()%(MAX_DECK+1);
-
-        // set discard count
-        G.discardCount[thisPlayer] = rand()%(MAX_DECK+1);
-
-        // set current player's coins
-        G.coins = rand()%(60+1)*1 + rand()%(40+1)*3 + rand()%(30+1)*6;
-
-        numberOfEstate = rand()%G.handCount[thisPlayer];
-
-        // set hand card randomly with exception
-        assignRandomCardToHand(&G, thisPlayer, exception);
-
-        // put randomly number of estate to the hand
-        assignSpecificCardToHand(&G, thisPlayer, numberOfEstate, estate);
-
-        // make a copy for comprasion
-        memcpy(&testG, &G, sizeof(struct gameState));
-
-        // let call the function
-        baronEffect(&testG, choice1, thisPlayer);
-
-        // assertion
-        printf("choice1 = %d | estate on hand = %d | estate in supply = %d \n\n", choice1, numberOfEstate,  G.supplyCount[estate]);
-        if ( choice1 == 1 && getSpecificHandCount(&testG, thisPlayer, estate) > 0){
-            printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] - discarded);
-            printAssert(testG.handCount[thisPlayer] == (G.handCount[thisPlayer] - discarded));
-            
-            printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer]);
-            printAssert(testG.deckCount[thisPlayer] == G.deckCount[thisPlayer]);
-            
-            xtraCoins = 4;
-            printf("coins = %d, expected = %d\n", testG.coins, G.coins + xtraCoins);
-            printAssert(testG.coins == G.coins + xtraCoins);
-
-            printf("dicard count = %d, expected = %d\n", testG.discardCount[thisPlayer], G.discardCount[thisPlayer] + discarded);
-            printAssert(testG.discardCount[thisPlayer] == G.discardCount[thisPlayer] + discarded);
-        }
-        else{
-            newCards = 1;
-            discarded = 1; // played card
-            printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] - discarded);
-            printAssert(testG.handCount[thisPlayer] == (G.handCount[thisPlayer] - discarded));
-            
-            printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer]);
-            printAssert(testG.deckCount[thisPlayer] == G.deckCount[thisPlayer]);
-            
-            printf("coins = %d, expected = %d\n", testG.coins, G.coins);
-            printAssert(testG.coins == G.coins);
-
-            printf("dicard count = %d, expected = %d\n", testG.discardCount[thisPlayer], G.discardCount[thisPlayer] + discarded );
-            printAssert(testG.discardCount[thisPlayer] == G.discardCount[thisPlayer] + discarded);
-        }
+int asserttrue(int expr, char *error)
+{
+    if (!expr)
+    {
+        printf("Assertion failed: %s\n", error);
+        return 1;
     }
-
-    printf("\n >>>>> Testing complete %s <<<<<\n\n", TESTCARD);
-
-
     return 0;
 }
 
-void printAssert(int flag){
-    if(flag) printf("Passed\n-\n");
-    else printf("Failed\n-\n");
+// test oracle for playBaron
+int checkPlayBaron(struct gameState *post, int currentPlayer, int choice1, int estateHandPosition)
+{
+    struct gameState pre;
+    int p = estateHandPosition;
+    memcpy(&pre, post, sizeof(struct gameState));
+    ASSERT(memcmp(&pre, post, sizeof(struct gameState)) == 0, "memcpy failed coping pre and post states");
+    ASSERT(playBaron(post, choice1, currentPlayer) == 0, "playBaron did not return 0");
+
+    pre.numBuys++;
+    if (choice1 == 0)
+    {
+        pre.discard[currentPlayer][pre.discardCount[currentPlayer]] = estate;
+        pre.discardCount[currentPlayer]++;
+        pre.supplyCount[estate]--;
+    }
+    else if (choice1 == 1 && estateHandPosition == -1)
+    {
+        pre.discard[currentPlayer][pre.discardCount[currentPlayer]] = estate;
+        pre.discardCount[currentPlayer]++;
+        pre.supplyCount[estate]--;
+    }
+    else if (choice1 == 1)
+    {
+        pre.coins += 4;
+        pre.discard[currentPlayer][pre.discardCount[currentPlayer]] = pre.hand[currentPlayer][p];
+        pre.discardCount[currentPlayer]++;
+        for (; p < pre.handCount[currentPlayer]; p++)
+        {
+            pre.hand[currentPlayer][p] = pre.hand[currentPlayer][p + 1];
+        }
+        pre.hand[currentPlayer][pre.handCount[currentPlayer]] = -1;
+        pre.handCount[currentPlayer]--;
+    }
+
+    return asserttrue(memcmp(&pre, post, sizeof(struct gameState)) == 0, "memcmp return not 0");
 }
+int main()
+{
+    printf("\n----------------- Testing : %s ----------------\n", TESTCARD);
+    // initialization variables
+    struct gameState g;
+    int i, n, handCount, choice1, estateHandPosition = -1, testRun = 100000, testsFailed = 0;
+    int currentPlayer = 0;
+    srand(time(0));
 
-void setHandCards(struct gameState *G, int player, int card1, int card2, int card3, int card4, int card5){
-    G->hand[player][0]=card1;
-    G->hand[player][1]=card2;
-    G->hand[player][2]=card3;
-    G->hand[player][3]=card4;
-    G->hand[player][4]=card5;
-}
+    for (n = 0; n < testRun; n++)
+    {
+        for (i = 0; i < sizeof(struct gameState); i++)
+        {
+            ((char *)&g)[i] = rand() % 256;
+        }
 
-void assignRandomCardToHand(struct gameState *G, int player, int exception[]){
-    int i, j;
-    int randomCard;
-    int exceptionFlag;
-    //if (exception[0] != -1)
-    size_t n = sizeof(exception)/sizeof(exception[0]);
+        choice1 = rand() % 2;
+        currentPlayer = rand() % MAX_PLAYERS;
+        g.supplyCount[estate] = rand() % MAX_DECK + 1; 
+        g.discardCount[currentPlayer] = rand() % MAX_DECK;
+        g.handCount[currentPlayer] = rand() % MAX_HAND;
+        handCount = g.handCount[currentPlayer];
 
-    //printf("here!!! n = %d \n\n", n);
-
-    for ( i = 0; i < G->handCount[player] ; i++ ){  
-       //printf("inside for loop!!!\n\n");
-       do{
-            //printf("inside while loop!!!\n\n");
-            exceptionFlag = 0;
-            randomCard = rand() % (treasure_map+1);
-            //printf("randomCard = %d", randomCard);
-            for( j = 0 ; j < n ; j++){
-                if (randomCard == exception[j]){
-                    exceptionFlag = 1;
-                    break;
-                }
+        // 1 in 4 chances that the player will have an estate in their hand
+        if (rand() % 4 == 0)
+        {
+            if (handCount == 0) // prevents mod by 0 error (floating point exception: 8)
+            {
+                estateHandPosition = 0;
+                g.hand[currentPlayer][estateHandPosition] = estate;
             }
-       }while(exceptionFlag);
-
-       // random is not the one in exceptinon; assign it to the hand
-       G->hand[player][i] = randomCard;
-
-    }
-
-    //printf("end of assignRandomCardToHand!!!\n\n");
-}
-
-void assignSpecificCardToHand(struct gameState *G, int player, int numberOfCard, int card){
-    int count;
-    int collision;
-    int index;
-
-    if (G->handCount[player] <= 1)
-        return;
-
-    if (numberOfCard > G->handCount[player])
-        numberOfCard = G->handCount[player]-1;
-
-    for( count = 0 ; count < numberOfCard ; count++ ){
-        do{
-            collision = 0;
-            index = rand()%G->handCount[player];
-            //printf("index = %d \n", index);
-            //printf("handcount = %d\n",G->handCount[player]);
-            //printf("card[0]=%d\n", G->hand[player][0]);
-            //printf("card[1]=%d\n", G->hand[player][1]);            
-            //printHand(G,player);
-            if ( G->hand[player][index] == card ) {
-                collision = 1;
-                //printf("collision\n");
-                //printf(" G->hand[player][index] = %d, card = %d \n\n", G->hand[player][index], card);
+            else    //randomly assign estate to hand
+            {
+                estateHandPosition = rand() % handCount;
+                g.hand[currentPlayer][estateHandPosition] = estate;
+            }
+        }
+        else 
+        {
+            // ensure that no estates in player hand
+            for (i = 0; i <= 10; i++)
+            {
+                g.hand[currentPlayer][i] = rand() % treasure_map + 2;
             }
 
-        }while(collision);
+            estateHandPosition = -1;
+        }
 
-        G->hand[player][index] = card;
+        testsFailed += checkPlayBaron(&g, currentPlayer, choice1, estateHandPosition);
     }
-}
-
-/*void printHand(struct gameState *G, int player){
-    int i;
-    for(i = 0 ; i < 5; i++){
-        printf("Card %d on hand = %d\n", i+1, G->hand[player][i]);
-    }
-}*/
-
-int getSpecificHandCount(struct gameState *G, int player, int card){
-    int count = 0;
-    int i;
-    for(i = 0 ; i < 5; i++){
-        if(G->hand[player][i] == card) count++;
-    }
-    return card;
-}
-
-int printHand(struct gameState *G, int player){
-    int i;
-    for (i = 0; i < G->handCount[player] ; i++){
-        printf("G.hand[%d][%d] = %d \n\n", player, i, G->hand[player][i]);
-    }
+    printf(" Tests Ran: %d \n", testRun);
+    printf(" Tests Failed: %d \n", testsFailed);
+    double failPercent = (double)testsFailed / (double)testRun * 100;
+    printf(" Percent of tests failed %0.4lf%% \n", failPercent);
+    printf("** Random test card 1 concluded. **\n");
+    return 0;
 }
