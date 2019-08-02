@@ -74,7 +74,7 @@ int checkPlayMinion(struct gameState *post, int choice1, int choice2, int curren
     int i, j;
     memcpy(&pre, post, sizeof(struct gameState));
     ASSERT(memcmp(&pre, post, sizeof(struct gameState)) == 0, "memcpy failed coping pre and post states");
-    ASSERT(playMinion(post, choice1, choice2, currentPlayer, handPos) == 0, "playMinion did not return 0");
+    ASSERT(minionEffect(post, choice1, choice2, handPos, currentPlayer) == 0, "playMinion did not return 0");
 
     pre.numActions++;
     discardCard(handPos, currentPlayer, &pre, 0);
@@ -129,7 +129,7 @@ int main()
     struct testCount t;
     testInit(&t);
 
-    int i, n, j, k, handCount, choice1, choice2, handPos, testRun = 100000;
+    int i, n, j, k, handCount, choice1, choice2, handPos, testRun = 100;
     int currentPlayer = 0;
     srand(time(0));
     for (n = 0; n < testRun; n++)
