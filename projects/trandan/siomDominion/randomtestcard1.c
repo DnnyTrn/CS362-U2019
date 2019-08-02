@@ -69,7 +69,7 @@ int main()
     printf("\n----------------- Testing : %s ----------------\n", TESTCARD);
     // initialization variables
     struct gameState g;
-    int i, n, handCount, choice1, estateHandPosition = -1, testRun = 10, testsFailed = 0;
+    int i, n, handCount, choice1, estateHandPosition = -1, testRun = 100, testsFailed = 0;
     int currentPlayer = 0;
     srand(time(0));
 
