@@ -5,6 +5,7 @@
 // ./randomtestcard1
 // gcov dominion -b
 #include "dominion.h"
+#include "dominion_helpers.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,7 +21,7 @@ int asserttrue(int expr, char *error)
 {
     if (!expr)
     {
-        printf("Assertion failed: %s\n", error);
+        if(DEBUG) printf("Assertion failed: %s\n", error);
         return 1;
     }
     return 0;
@@ -33,7 +34,7 @@ int checkPlayBaron(struct gameState *post, int currentPlayer, int choice1, int e
     int p = estateHandPosition;
     memcpy(&pre, post, sizeof(struct gameState));
     ASSERT(memcmp(&pre, post, sizeof(struct gameState)) == 0, "memcpy failed coping pre and post states");
-    ASSERT(playBaron(post, choice1, currentPlayer) == 0, "playBaron did not return 0");
+    ASSERT(baronEffect(post, choice1, currentPlayer) == 0, "playBaron did not return 0");
 
     pre.numBuys++;
     if (choice1 == 0)
@@ -68,7 +69,7 @@ int main()
     printf("\n----------------- Testing : %s ----------------\n", TESTCARD);
     // initialization variables
     struct gameState g;
-    int i, n, handCount, choice1, estateHandPosition = -1, testRun = 100000, testsFailed = 0;
+    int i, n, handCount, choice1, estateHandPosition = -1, testRun = 10, testsFailed = 0;
     int currentPlayer = 0;
     srand(time(0));
 
