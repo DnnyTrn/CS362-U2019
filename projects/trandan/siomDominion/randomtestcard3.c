@@ -75,7 +75,7 @@ int checkPlayTribute(struct gameState *post, int nextPlayer, int *tributeReveale
     memcpy(&pre, post, sizeof(struct gameState));
     ASSERT(memcmp(&pre, post, sizeof(struct gameState)) == 0, "memcpy failed coping pre and post states");
 
-    ASSERT(playTribute(post, nextPlayer, tributeRevealedCards, currentPlayer) == 0, "playTribute did not return 0");
+    ASSERT(tributeEffect(post, currentPlayer, currentPlayer, tributeRevealedCards) == 0, "playTribute did not return 0");
 
     for (i = 0; i < 2; i++)
     {
@@ -111,7 +111,7 @@ int main()
     struct gameState g;
     struct testCount t;
     testInit(&t);
-    int i, j, n, testRun = 100000, currentPlayer, nextPlayer;
+    int i, j, n, testRun = 100, currentPlayer, nextPlayer;
     int tributedRevealedCards[] = {};
     srand(time(0));
     for (n = 0; n < testRun; n++)
