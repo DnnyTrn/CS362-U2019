@@ -1135,7 +1135,7 @@ int minionEffect(struct gameState *state, int gain2Coins, int discardToDraw4, in
   
   if (gain2Coins)    //+2 coins
   {
-    printf("coin gained!!!!\n");
+    // printf("coin gained!!!!\n");
     state->coins += 2;
   }
   else if (discardToDraw4)   //discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
