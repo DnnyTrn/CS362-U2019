@@ -78,11 +78,11 @@ int checkPlayMinion(struct gameState *post, int choice1, int choice2, int curren
 
     pre.numActions++;
     discardCard(handPos, currentPlayer, &pre, 0);
-    if (choice2)
+    if (choice1)
     {
         pre.coins = pre.coins + 2;
     }
-    else if (choice1)
+    else if (choice2)
     {
         while (pre.handCount[currentPlayer] > 0)
         {
@@ -129,7 +129,7 @@ int main()
     struct testCount t;
     testInit(&t);
 
-    int i, n, j, k, handCount, choice1, choice2, handPos, testRun = 100;
+    int i, n, j, k, handCount, choice1, choice2, handPos, testRun = 10000;
     int currentPlayer = 0;
     srand(time(0));
     for (n = 0; n < testRun; n++)
