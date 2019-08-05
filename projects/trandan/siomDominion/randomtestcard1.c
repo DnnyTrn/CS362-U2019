@@ -34,8 +34,7 @@ int checkPlayBaron(struct gameState *post, int currentPlayer, int choice1, int e
     int p = estateHandPosition;
     memcpy(&pre, post, sizeof(struct gameState));
     ASSERT(memcmp(&pre, post, sizeof(struct gameState)) == 0, "memcpy failed coping pre and post states");
-    ASSERT(baronEffect(post, choice1, currentPlayer) == 0, "playBaron did not return 0");
-
+    baronEffect(post, choice1, currentPlayer);
     pre.numBuys++;
     if (choice1 == 0)
     {
@@ -69,7 +68,7 @@ int main()
     printf("\n----------------- Testing : %s ----------------\n", TESTCARD);
     // initialization variables
     struct gameState g;
-    int i, n, handCount, choice1, estateHandPosition = -1, testRun = 100, testsFailed = 0;
+    int i, n, handCount, choice1, estateHandPosition = -1, testRun = 10000, testsFailed = 0;
     int currentPlayer = 0;
     srand(time(0));
 
@@ -85,6 +84,7 @@ int main()
         g.supplyCount[estate] = rand() % MAX_DECK + 1; 
         g.discardCount[currentPlayer] = rand() % MAX_DECK;
         g.handCount[currentPlayer] = rand() % MAX_HAND;
+        g.numPlayers = MAX_PLAYERS;
         handCount = g.handCount[currentPlayer];
 
         // 1 in 4 chances that the player will have an estate in their hand
