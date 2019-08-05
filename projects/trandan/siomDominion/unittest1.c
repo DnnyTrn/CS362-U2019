@@ -1,6 +1,5 @@
 // to compile this file
 // gcc -o unittest1 dominion.c rngs.c unittest1.c
-
 #include "dominion.h"
 #include "dominion_helpers.h"
 #include "rngs.h"
@@ -31,7 +30,7 @@ int main()
 
     // Test 1 playBaron() returns 0 for successful execution
     printf("Test 1: Testing playBaron() for execution\n");
-    ASSERT(playBaron(&test_game, choice1, currentPlayer) == 0, "playBaron() did not return 0");
+    ASSERT(baronEffect(&test_game, choice1, currentPlayer) == 0, "playBaron() did not return 0");
 
     // Test 2: Expected Buy count is 2 reguardless of choice1 value
     int buyCount = test_game.numBuys;
@@ -61,7 +60,7 @@ int main()
     // ** Choice 2 Testing **
     int choice2 = 0;
     struct gameState test_game2;
-    playBaron(&test_game2, choice2, currentPlayer);
+    baronEffect(&test_game2, choice2, currentPlayer);
 
     //Test 6 (repeat of Test 2 for buy count)
     buyCount = test_game.numBuys;
